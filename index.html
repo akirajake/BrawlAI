@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BrawlAI 1.1</title>
+    <title>BrawlAI 1.2</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         #chat-history {
@@ -40,7 +40,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
             </svg>
-            <h1 class="text-lg font-bold text-gray-800 tracking-wide">ブロスタ専用AI (最新情報対応版)</h1>
+            <h1 class="text-lg font-bold text-gray-800 tracking-wide">ブロスタ専用AI</h1>
         </div>
         <button id="settings-btn" class="text-sm font-medium text-gray-500 hover:text-gray-900 flex items-center space-x-1 transition-colors">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -61,7 +61,7 @@
         <div class="max-w-4xl mx-auto flex items-end space-x-3">
             <textarea
                 id="chat-input"
-                placeholder="質問を入力（例: 最新キャラの性能は？ / 今の環境で強いのは？）"
+                placeholder="ブロスタに関する質問を入力してください（Shift + Enterで改行）"
                 class="flex-1 bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500 resize-none min-h-[50px] max-h-[150px] text-sm"
                 rows="1"
             ></textarea>
@@ -78,9 +78,9 @@
 
     <!-- 設定モーダル -->
     <div id="settings-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-60 flex items-center justify-center z-50 p-4 backdrop-blur-sm transition-opacity">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-                <h2 class="text-lg font-bold text-gray-800">API・モデル設定</h2>
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50 flex-shrink-0">
+                <h2 class="text-lg font-bold text-gray-800">API・機能設定</h2>
                 <button id="close-modal-btn" class="text-gray-400 hover:text-gray-600 transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -88,7 +88,7 @@
                 </button>
             </div>
             
-            <div class="p-6 space-y-5">
+            <div class="p-6 space-y-6 overflow-y-auto">
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Google AI Studio APIキー</label>
                     <div class="flex space-x-2">
@@ -104,11 +104,26 @@
                     <select id="model-select" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gray-500 bg-white">
                         <option value="">APIキーを入力して取得してください</option>
                     </select>
-                    <p class="text-xs text-gray-500 mt-2">※Web検索機能を使うため、<b>gemini-1.5-pro</b> または <b>gemini-2.5-flash</b> 系を推奨します。</p>
+                </div>
+
+                <!-- 検索機能のON/OFFトグル -->
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <label class="flex items-start space-x-3 cursor-pointer">
+                        <div class="flex-shrink-0 mt-0.5">
+                            <input type="checkbox" id="use-search-checkbox" class="w-4 h-4 text-gray-800 border-gray-300 rounded focus:ring-gray-800">
+                        </div>
+                        <div>
+                            <span class="text-sm font-bold text-gray-800 block">Web検索を有効にする（最新情報）</span>
+                            <p class="text-xs text-gray-500 mt-1 leading-relaxed">
+                                AIがGoogle検索をして最新のキャラ情報等を調べます。<br>
+                                <span class="text-red-500 font-semibold">※注意: 無料枠のAPIキーだと「Quota exceeded」エラーが出やすくなります。エラーが出た場合はチェックを外してください。</span>
+                            </p>
+                        </div>
+                    </label>
                 </div>
             </div>
 
-            <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-between items-center">
+            <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-between items-center flex-shrink-0">
                 <button id="clear-settings-btn" class="text-sm text-red-600 hover:text-red-800 font-medium px-2 py-1 rounded transition-colors">
                     設定を削除
                 </button>
@@ -122,10 +137,13 @@
     <script>
         let currentApiKey = localStorage.getItem('brawl_ai_api_key') || '';
         let currentModel = localStorage.getItem('brawl_ai_model') || '';
+        // デフォルトはオフにしてエラーを防ぐ
+        let useSearch = localStorage.getItem('brawl_ai_use_search') === 'true' || false;
+        
         let chatMessages = [
             { 
                 role: 'model', 
-                text: 'ブロスタ専用AIです。\nGoogle検索と連携し、最新のキャラクター情報や現在のメタ環境についても回答できるようになりました。知りたいことをご質問ください。' 
+                text: 'ブロスタ専用AIです。\nキャラクターの立ち回りや環境などについてご質問ください。\n※「設定」からWeb検索をONにすると最新キャラにも対応しますが、APIの制限エラーが出る場合はOFFにしてご利用ください。' 
             }
         ];
         let isLoading = false;
@@ -138,6 +156,7 @@
             modal: document.getElementById('settings-modal'),
             apiKeyInput: document.getElementById('api-key-input'),
             modelSelect: document.getElementById('model-select'),
+            useSearchCheckbox: document.getElementById('use-search-checkbox'),
             fetchModelsBtn: document.getElementById('fetch-models-btn'),
             saveBtn: document.getElementById('save-settings-btn'),
             clearBtn: document.getElementById('clear-settings-btn'),
@@ -146,6 +165,7 @@
 
         function init() {
             renderMessages();
+            dom.useSearchCheckbox.checked = useSearch;
             if (currentApiKey) {
                 dom.apiKeyInput.value = currentApiKey;
                 fetchModelsSilently(currentApiKey);
@@ -176,7 +196,6 @@
                 }`;
                 bubble.innerHTML = formatText(msg.text);
 
-                // もしグラウンディング（検索元）情報があれば追加
                 if (msg.sources && msg.sources.length > 0) {
                     const sourceDiv = document.createElement('div');
                     sourceDiv.className = "mt-3 pt-2 border-t border-gray-100 text-xs text-gray-500";
@@ -201,6 +220,7 @@
             const wrapper = document.createElement('div');
             wrapper.id = 'loading-indicator';
             wrapper.className = 'flex justify-start';
+            const searchLabel = useSearch ? '<span class="text-xs text-gray-400 ml-2">Web検索中...</span>' : '';
             wrapper.innerHTML = `
                 <div class="flex flex-row max-w-[85%]">
                     <div class="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full mt-1 bg-gray-200 mr-3">
@@ -210,7 +230,7 @@
                         <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
                         <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
                         <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.4s"></div>
-                        <span class="text-xs text-gray-400 ml-2">最新情報を検索中...</span>
+                        ${searchLabel}
                     </div>
                 </div>
             `;
@@ -304,6 +324,7 @@
         dom.saveBtn.addEventListener('click', () => {
             const key = dom.apiKeyInput.value.trim();
             const model = dom.modelSelect.value;
+            const searchEnabled = dom.useSearchCheckbox.checked;
             
             if (!key) {
                 alert('APIキーを入力してください。');
@@ -316,8 +337,12 @@
 
             currentApiKey = key;
             currentModel = model;
+            useSearch = searchEnabled;
+            
             localStorage.setItem('brawl_ai_api_key', currentApiKey);
             localStorage.setItem('brawl_ai_model', currentModel);
+            localStorage.setItem('brawl_ai_use_search', useSearch);
+            
             dom.modal.classList.add('hidden');
         });
 
@@ -325,9 +350,12 @@
             if (confirm('保存されているAPIキーと設定をブラウザから削除しますか？')) {
                 currentApiKey = '';
                 currentModel = '';
+                useSearch = false;
                 localStorage.removeItem('brawl_ai_api_key');
                 localStorage.removeItem('brawl_ai_model');
+                localStorage.removeItem('brawl_ai_use_search');
                 dom.apiKeyInput.value = '';
+                dom.useSearchCheckbox.checked = false;
                 dom.modelSelect.innerHTML = '<option value="">APIキーを入力して取得してください</option>';
                 alert('設定を削除しました。');
             }
@@ -352,19 +380,20 @@
             dom.sendBtn.disabled = true;
             renderLoading();
 
-            // システムプロンプトを大幅に強化し、検索の必要性を指示
+            // 検索ON/OFFでプロンプトを少し変更する
+            const searchInstruction = useSearch 
+                ? "最新キャラクターや環境については、必ずGoogle検索ツールを使用して事実確認してから回答してください。"
+                : "現在の知識の範囲内で回答してください。知らない最新キャラクターについては正直に分からないと伝えてください。";
+
             const systemPrompt = `あなたはスーパーセルが配信するスマホゲーム『ブロスタ（Brawl Stars）』に特化した専用AIアシスタントです。
 以下のルールに厳格に従ってユーザーと会話してください。
 
-【重要：最新情報の検索】
-1. あなたの知識は過去のものである可能性があります。新キャラクター、最新のハイパーチャージ、バランス調整、海外版先行キャラクターなどの質問が来た場合は、必ず組み込まれているGoogle検索ツールを使用して最新の情報を調べてから回答してください。
-2. ユーザーが「シリウス」などの新しいキャラクター、あるいは知らない用語を出した場合は、自分の知識で「存在しない」と決めつけず、まず「Brawl Stars [キャラクター名]」などでWeb検索を行って事実確認をしてください。
-
 【行動ルール】
 1. 専門性: ブロスタに関する質問に的確かつ実践的なアドバイスを提供してください。
-2. 世界観の維持: ブロスタ以外の話題を振られた場合は絶対に答えないでください。「申し訳ありませんが、ブロスタ以外の質問にはお答えできません。」と丁寧に断ってください。
-3. トーン＆マナー: 丁寧で落ち着いたトーンで回答してください。絵文字は一切使用しないでください。
-4. 構成: 読みやすくするために箇条書きや改行をうまく使ってください。`;
+2. 情報の扱い: ${searchInstruction}
+3. 世界観の維持: ブロスタ以外の話題を振られた場合は絶対に答えないでください。「申し訳ありませんが、ブロスタ以外の質問にはお答えできません。」と丁寧に断ってください。
+4. トーン＆マナー: 丁寧で落ち着いたトーンで回答してください。絵文字は一切使用しないでください。
+5. 構成: 読みやすくするために箇条書きや改行をうまく使ってください。`;
 
             try {
                 const historyForApi = chatMessages.slice(1).map(msg => ({
@@ -374,10 +403,13 @@
 
                 const payload = {
                     contents: historyForApi,
-                    systemInstruction: { parts: [{ text: systemPrompt }] },
-                    // 【追加】Google検索によるグラウンディングを有効化
-                    tools: [{ "googleSearch": {} }]
+                    systemInstruction: { parts: [{ text: systemPrompt }] }
                 };
+
+                // 検索がONの場合のみtoolsを追加
+                if (useSearch) {
+                    payload.tools = [{ "googleSearch": {} }];
+                }
 
                 const url = `https://generativelanguage.googleapis.com/v1beta/${currentModel}:generateContent?key=${currentApiKey}`;
 
@@ -390,23 +422,24 @@
                 if (!response.ok) {
                     const errorData = await response.json().catch(() => ({}));
                     
-                    // 古いモデル等でgoogleSearchツールがサポートされていない場合のエラーハンドリング
-                    if(errorData.error?.message?.includes("googleSearch") || response.status === 400) {
-                        throw new Error("選択したモデルはWeb検索連携に対応していません。設定からgemini-1.5-proやgemini-2.5-flash等の新しいモデルを選択してください。");
+                    if(errorData.error?.message?.includes("Quota") || errorData.error?.message?.includes("exceeded")) {
+                        throw new Error("APIの利用制限(Quota)を超過しました。\n【対策】右上の「設定」から「Web検索を有効にする」のチェックを外して保存し、再度お試しください。");
                     }
+                    if(errorData.error?.message?.includes("googleSearch") || response.status === 400) {
+                        throw new Error("選択したモデルはWeb検索連携に対応していません。\n【対策】設定から検索をOFFにするか、gemini-1.5-pro等の対応モデルを選択してください。");
+                    }
+                    
                     throw new Error(errorData.error?.message || `通信エラーが発生しました (${response.status})`);
                 }
 
                 const data = await response.json();
                 const replyText = data.candidates?.[0]?.content?.parts?.[0]?.text || '返答を生成できませんでした。';
                 
-                // 検索ソース（参考リンク）の抽出
                 let sources = [];
                 const groundingMetadata = data.candidates?.[0]?.groundingMetadata;
-                if (groundingMetadata && groundingMetadata.groundingChunks) {
+                if (useSearch && groundingMetadata && groundingMetadata.groundingChunks) {
                     groundingMetadata.groundingChunks.forEach(chunk => {
                         if (chunk.web && chunk.web.uri && chunk.web.title) {
-                            // 重複を排除して追加
                             if(!sources.find(s => s.uri === chunk.web.uri)) {
                                 sources.push({
                                     title: chunk.web.title,
@@ -427,7 +460,7 @@
                 console.error(err);
                 chatMessages.push({ 
                     role: 'model', 
-                    text: `エラーが発生しました。\n詳細: ${err.message}` 
+                    text: `エラーが発生しました。\n${err.message}` 
                 });
             } finally {
                 isLoading = false;
